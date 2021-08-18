@@ -35,8 +35,13 @@ namespace RentFinder_API
             });
 
             services.AddControllers();
-       
+
+            services.AddIdentityCore<IdentityUser<Guid>>(options => options.SignIn.RequireConfirmedEmail = true)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
         }
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

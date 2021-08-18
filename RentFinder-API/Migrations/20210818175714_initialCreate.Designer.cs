@@ -10,7 +10,7 @@ using RentFinder_API.Models;
 namespace RentFinder_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210818171043_initialCreate")]
+    [Migration("20210818175714_initialCreate")]
     partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
