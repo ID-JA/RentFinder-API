@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RentFinder_API.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<Guid>
     {
         public string FirstName { get; set; }
 

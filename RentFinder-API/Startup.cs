@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,10 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using RentFinder_API.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RentFinder_API
@@ -38,6 +41,41 @@ namespace RentFinder_API
 
             services.AddIdentityCore<IdentityUser<Guid>>(options => options.SignIn.RequireConfirmedEmail = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+           .AddJwtBearer(options =>
+           {
+               options.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidateIssuerSigningKey = true,
+                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
+                       .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                   ValidateIssuer = false,
+                   ValidateAudience = false
+               };
+           });
+
+            IdentityBuilder builder = services.AddIdentityCore<ApplicationUser>(
+               opt =>
+               {
+                   opt.Password.RequireDigit = false;
+                   opt.Password.RequiredLength = 4;
+                   opt.Password.RequireNonAlphanumeric = false;
+                   opt.Password.RequireLowercase = true;
+                   opt.Password.RequireUppercase = true;
+               }
+             );
+            builder = new IdentityBuilder(builder.UserType, typeof(ApplicationRole), builder.Services);
+            builder.AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.AddDefaultTokenProviders();
+            builder.AddRoleValidator<RoleValidator<ApplicationRole>>();
+            builder.AddRoleManager<RoleManager<ApplicationRole>>();
+            builder.AddSignInManager<SignInManager<ApplicationUser>>();
+            builder.AddUserManager<UserManager<ApplicationUser>>();
+
+            //services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         }
 

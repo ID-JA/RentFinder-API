@@ -8,14 +8,14 @@ namespace RentFinder_API.Models
 {
     public class Rating
     {
-        public string IdUser { get; set; }
-        public Guid IdAnnouncement { get; set; }
+        public Guid UserId { get; set; }
+        public Guid AnnouncementId { get; set; }
         public int Value { get; set; }
 
-        [ForeignKey("IdUser")]
-        public ApplicationUser User { get; set; }
+        [ForeignKey("UserId")]
+        public ApplicationUser ApplicationUser { get; set; }
 
-        [ForeignKey("IdAnnouncement")]
+        [ForeignKey("AnnouncementId")]
         public Announcement Announcement { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using RentFinder_API.Models;
 namespace RentFinder_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210818175714_initialCreate")]
+    [Migration("20210819142128_initialCreate")]
     partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,10 @@ namespace RentFinder_API.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
@@ -47,6 +51,8 @@ namespace RentFinder_API.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityRole<Guid>");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -83,6 +89,10 @@ namespace RentFinder_API.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -136,6 +146,8 @@ namespace RentFinder_API.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser<Guid>");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -222,11 +234,11 @@ namespace RentFinder_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
@@ -263,30 +275,79 @@ namespace RentFinder_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdUser");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Announcements");
                 });
 
+            modelBuilder.Entity("RentFinder_API.Models.Favorite", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AnnouncementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "AnnouncementId");
+
+                    b.HasIndex("AnnouncementId");
+
+                    b.ToTable("Favorites");
+                });
+
+            modelBuilder.Entity("RentFinder_API.Models.FeedBack", b =>
+                {
+                    b.Property<Guid>("FeedBackId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("FeedBackId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FeedBacks");
+                });
+
+            modelBuilder.Entity("RentFinder_API.Models.Rating", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AnnouncementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "AnnouncementId");
+
+                    b.HasIndex("AnnouncementId");
+
+                    b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("RentFinder_API.Models.ApplicationRole", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>");
+
+                    b.HasDiscriminator().HasValue("ApplicationRole");
+                });
+
             modelBuilder.Entity("RentFinder_API.Models.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser<System.Guid>");
 
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -294,97 +355,10 @@ namespace RentFinder_API.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApplicationUsers");
-                });
-
-            modelBuilder.Entity("RentFinder_API.Models.Favorite", b =>
-                {
-                    b.Property<Guid>("IdAnnouncement")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("IdAnnouncement", "IdUser");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("Favorites");
-                });
-
-            modelBuilder.Entity("RentFinder_API.Models.FeedBack", b =>
-                {
-                    b.Property<Guid>("IdFeedBack")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdFeedBack");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("FeedBacks");
-                });
-
-            modelBuilder.Entity("RentFinder_API.Models.Rating", b =>
-                {
-                    b.Property<Guid>("IdAnnouncement")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdAnnouncement", "IdUser");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("Ratings");
+                    b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -440,44 +414,46 @@ namespace RentFinder_API.Migrations
 
             modelBuilder.Entity("RentFinder_API.Models.Announcement", b =>
                 {
-                    b.HasOne("RentFinder_API.Models.ApplicationUser", "User")
+                    b.HasOne("RentFinder_API.Models.ApplicationUser", null)
                         .WithMany("Announcements")
-                        .HasForeignKey("IdUser");
+                        .HasForeignKey("ApplicationUserId");
                 });
 
             modelBuilder.Entity("RentFinder_API.Models.Favorite", b =>
                 {
                     b.HasOne("RentFinder_API.Models.Announcement", "Announcement")
                         .WithMany("Favorites")
-                        .HasForeignKey("IdAnnouncement")
+                        .HasForeignKey("AnnouncementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RentFinder_API.Models.ApplicationUser", "User")
+                    b.HasOne("RentFinder_API.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Favorites")
-                        .HasForeignKey("IdUser")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("RentFinder_API.Models.FeedBack", b =>
                 {
-                    b.HasOne("RentFinder_API.Models.ApplicationUser", "User")
+                    b.HasOne("RentFinder_API.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("IdUser");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RentFinder_API.Models.Rating", b =>
                 {
                     b.HasOne("RentFinder_API.Models.Announcement", "Announcement")
                         .WithMany("Ratings")
-                        .HasForeignKey("IdAnnouncement")
+                        .HasForeignKey("AnnouncementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RentFinder_API.Models.ApplicationUser", "User")
+                    b.HasOne("RentFinder_API.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Ratings")
-                        .HasForeignKey("IdUser")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

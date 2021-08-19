@@ -11,12 +11,12 @@ namespace RentFinder_API.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid IdFeedBack { get; set; }
+        public Guid FeedBackId { get; set; }
         public string Content { get; set; }
         public int Value { get; set; }
-        public string IdUser { get; set; }
+        public Guid UserId { get; set; }
 
-        [ForeignKey("IdUser")]
-        public ApplicationUser User { get; set; }
+        [ForeignKey("UserId")]
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

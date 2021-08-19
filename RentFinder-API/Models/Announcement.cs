@@ -38,10 +38,10 @@ namespace RentFinder_API.Models
         public bool IsAvailable { get; set; }
 
 
-        public string IdUser { get; set; }
+        //public string UserId { get; set; }
 
-        [ForeignKey("IdUser")]
-        public ApplicationUser User { get; set; }
+        //[ForeignKey("UserId")]
+        //public ApplicationUser ApplicationUser { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
         public ICollection<Rating> Ratings { get; set; }
 

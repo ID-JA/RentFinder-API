@@ -8,42 +8,14 @@ namespace RentFinder_API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ApplicationUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    UserName = table.Column<string>(nullable: true),
-                    NormalizedUserName = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    NormalizedEmail = table.Column<string>(nullable: true),
-                    EmailConfirmed = table.Column<bool>(nullable: false),
-                    PasswordHash = table.Column<string>(nullable: true),
-                    SecurityStamp = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
-                    LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Picture = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApplicationUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(nullable: true)
+                    ConcurrencyStamp = table.Column<string>(nullable: true),
+                    Discriminator = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,61 +40,16 @@ namespace RentFinder_API.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    Discriminator = table.Column<string>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    Picture = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Announcements",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    Photos = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true),
-                    price = table.Column<float>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
-                    Location = table.Column<string>(nullable: true),
-                    TotalFloors = table.Column<int>(nullable: false),
-                    TotalBathrooms = table.Column<int>(nullable: false),
-                    TotalLivingrooms = table.Column<int>(nullable: false),
-                    TotalKitchens = table.Column<int>(nullable: false),
-                    TotalBedrooms = table.Column<int>(nullable: false),
-                    Surface = table.Column<float>(nullable: false),
-                    IsAvailable = table.Column<bool>(nullable: false),
-                    IdUser = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Announcements", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Announcements_ApplicationUsers_IdUser",
-                        column: x => x.IdUser,
-                        principalTable: "ApplicationUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FeedBacks",
-                columns: table => new
-                {
-                    IdFeedBack = table.Column<Guid>(nullable: false),
-                    Content = table.Column<string>(nullable: true),
-                    Value = table.Column<int>(nullable: false),
-                    IdUser = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FeedBacks", x => x.IdFeedBack);
-                    table.ForeignKey(
-                        name: "FK_FeedBacks_ApplicationUsers_IdUser",
-                        column: x => x.IdUser,
-                        principalTable: "ApplicationUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,6 +71,36 @@ namespace RentFinder_API.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Announcements",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Photos = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: true),
+                    price = table.Column<float>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    Location = table.Column<string>(nullable: true),
+                    TotalFloors = table.Column<int>(nullable: false),
+                    TotalBathrooms = table.Column<int>(nullable: false),
+                    TotalLivingrooms = table.Column<int>(nullable: false),
+                    TotalKitchens = table.Column<int>(nullable: false),
+                    TotalBedrooms = table.Column<int>(nullable: false),
+                    Surface = table.Column<float>(nullable: false),
+                    IsAvailable = table.Column<bool>(nullable: false),
+                    ApplicationUserId = table.Column<Guid>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Announcements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Announcements_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -232,25 +189,45 @@ namespace RentFinder_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Favorites",
+                name: "FeedBacks",
                 columns: table => new
                 {
-                    IdUser = table.Column<string>(nullable: false),
-                    IdAnnouncement = table.Column<Guid>(nullable: false)
+                    FeedBackId = table.Column<Guid>(nullable: false),
+                    Content = table.Column<string>(nullable: true),
+                    Value = table.Column<int>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Favorites", x => new { x.IdAnnouncement, x.IdUser });
+                    table.PrimaryKey("PK_FeedBacks", x => x.FeedBackId);
                     table.ForeignKey(
-                        name: "FK_Favorites_Announcements_IdAnnouncement",
-                        column: x => x.IdAnnouncement,
+                        name: "FK_FeedBacks_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Favorites",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    AnnouncementId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Favorites", x => new { x.UserId, x.AnnouncementId });
+                    table.ForeignKey(
+                        name: "FK_Favorites_Announcements_AnnouncementId",
+                        column: x => x.AnnouncementId,
                         principalTable: "Announcements",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Favorites_ApplicationUsers_IdUser",
-                        column: x => x.IdUser,
-                        principalTable: "ApplicationUsers",
+                        name: "FK_Favorites_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -259,31 +236,31 @@ namespace RentFinder_API.Migrations
                 name: "Ratings",
                 columns: table => new
                 {
-                    IdUser = table.Column<string>(nullable: false),
-                    IdAnnouncement = table.Column<Guid>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false),
+                    AnnouncementId = table.Column<Guid>(nullable: false),
                     Value = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Ratings", x => new { x.IdAnnouncement, x.IdUser });
+                    table.PrimaryKey("PK_Ratings", x => new { x.UserId, x.AnnouncementId });
                     table.ForeignKey(
-                        name: "FK_Ratings_Announcements_IdAnnouncement",
-                        column: x => x.IdAnnouncement,
+                        name: "FK_Ratings_Announcements_AnnouncementId",
+                        column: x => x.AnnouncementId,
                         principalTable: "Announcements",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Ratings_ApplicationUsers_IdUser",
-                        column: x => x.IdUser,
-                        principalTable: "ApplicationUsers",
+                        name: "FK_Ratings_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Announcements_IdUser",
+                name: "IX_Announcements_ApplicationUserId",
                 table: "Announcements",
-                column: "IdUser");
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -325,19 +302,19 @@ namespace RentFinder_API.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Favorites_IdUser",
+                name: "IX_Favorites_AnnouncementId",
                 table: "Favorites",
-                column: "IdUser");
+                column: "AnnouncementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FeedBacks_IdUser",
+                name: "IX_FeedBacks_UserId",
                 table: "FeedBacks",
-                column: "IdUser");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ratings_IdUser",
+                name: "IX_Ratings_AnnouncementId",
                 table: "Ratings",
-                column: "IdUser");
+                column: "AnnouncementId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -370,13 +347,10 @@ namespace RentFinder_API.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Announcements");
 
             migrationBuilder.DropTable(
-                name: "ApplicationUsers");
+                name: "AspNetUsers");
         }
     }
 }
